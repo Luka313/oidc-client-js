@@ -135,29 +135,17 @@ export default function getJoseUtil({ jws, KeyUtil, X509, crypto, hextob64u, b64
         }
 
         static hashString(value, alg) {
-            try {
-				console.log('ulazim u hash string');
-				console.log(value);
-				console.log(alg);
-				console.log(crypto);
-				console.log(crypto.Util);
-				console.log(crypto.Util.hashString);
-				console.log(crypto.Util.hashString(value,alg));
+            try {				
                 return crypto.Util.hashString(value, alg);
             } catch (e) {
-				console.error(e);
                 Log.error(e);
             }
         }
 
         static hexToBase64Url(value) {
-			console.log('hexToBase64Url');
             try {
-				console.log(value);
-				console.log(hextob64u);
                 return hextob64u(value);
             } catch (e) {
-				console.error(e);
                 Log.error(e);
             }
         }

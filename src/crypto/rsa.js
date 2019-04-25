@@ -266,10 +266,6 @@ const X509 = {
 const crypto = {
     Util: {
         hashString: function(value, alg) {
-			console.log('hashString');
-			console.log(DigestAlgs);
-			console.log(DigestAlgs['sha256']);
-			console.log(SHA256);
             var hashFunc = DigestAlgs[alg];
             return hashFunc(value).toString();
         },
