@@ -1,5 +1,5 @@
 // create a webpack configuration with all common parts included here
-var createWebpackConfig = function(options) {
+function createWebpackConfig(options) {
   return {
     mode: options.mode,
     entry: options.entry,

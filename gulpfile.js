@@ -113,8 +113,8 @@ var files = [
 //    ,'jsrsasign/ext/cj/sha1_min.js'
     ,'jsrsasign/ext/cj/sha256_min.js'
 //    ,'jsrsasign/ext/cj/sha224_min.js'
-    ,'jsrsasign/ext/cj/sha512_min.js'
-    ,'jsrsasign/ext/cj/sha384_min.js'
+//    ,'jsrsasign/ext/cj/sha512_min.js'
+//    ,'jsrsasign/ext/cj/sha384_min.js'
 //    ,'jsrsasign/ext/cj/ripemd160_min.js'
 //    ,'jsrsasign/ext/cj/hmac_min.js'
 //    ,'jsrsasign/ext/cj/pbkdf2_min.js'
@@ -130,8 +130,8 @@ var files = [
     ,'jsrsasign/ext/ec-patch-min.js'
     ,'jsrsasign/ext/json-sans-eval-min.js'
 
-	  ,'jsrsasign/min/asn1-1.0.min.js'
-  	,'jsrsasign/min/asn1hex-1.1.min.js'
+//	  ,'jsrsasign/min/asn1-1.0.min.js'
+//  	,'jsrsasign/min/asn1hex-1.1.min.js'
 //  	,'jsrsasign/min/asn1x509-1.0.min.js'
 //  	,'jsrsasign/min/asn1cms-1.0.min.js'
 //  	,'jsrsasign/min/asn1tsp-1.0.min.js'
@@ -159,8 +159,60 @@ function build_jsrsasign(){
         .pipe(gulp.dest('jsrsasign/dist/'));
 }
 
+function slimBuildTarget() {
+    return {
+        mode: 'production',
+        entry: ['./polyfills.js', './index.js'],
+        output: {
+            filename: 'oidc-client.slim.min.js',
+            libraryTarget: 'umd',
+            library: 'Oidc'
+        },
+        plugins: [],
+        optimization: {
+            minimizer: [
+                new UglifyJsPlugin({
+                    uglifyOptions: {
+                        compress: {
+                            keep_fnames: true
+                        }
+                    }
+                })
+            ]
+        }
+    };
+}
+
+// Adds a configuration for slimming down the production build. This build
+// does not contain the full babel-polyfill. Instead it imports specific
+// core-js polyfills
+function build_slim() {
+    return gulp.src('index.js')
+        .pipe(webpackStream(createWebpackConfig(slimBuildTarget()), webpack))
+        .pipe(gulp.dest('dist/'));
+};
+
+// Creates a build with only RSA256 exponent+modulus support (no X509)
+function build_slim_rsa() {
+    var conf = slimBuildTarget();
+    conf.output.filename = 'oidc-client.rsa256.slim.min.js';
+
+    // This plugin should always be first in the chain
+    conf.plugins.unshift(
+        new webpack.NormalModuleReplacementPlugin(/(.*)JoseUtil(\.js)?$/, (resource) => {
+            resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
+        })
+    );
+
+    return gulp.src('index.js')
+        .pipe(webpackStream(createWebpackConfig(conf), webpack))
+        .pipe(gulp.dest('dist/'));
+};
+
+
+
 // putting it all together
 //gulp.task('build', ['build-lib-sourcemap','build-lib-min','build-dist-sourcemap','build-dist-min']);
 exports.default = gulp.series(
   build_jsrsasign,
-  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min));
+  gulp.parallel(build_lib_sourcemap, build_lib_min, build_dist_sourcemap, build_dist_min, build_slim, build_slim_rsa));
