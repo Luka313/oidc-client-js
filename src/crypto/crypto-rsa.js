@@ -151,7 +151,7 @@ var DigestInfoHead = {
 };
 
 var DigestAlgs = {
-  sha256: SHA256,
+  SHA256: SHA256,
 };
 
 function RSAVerifier(modulus, exp) {
