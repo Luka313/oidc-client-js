@@ -97,7 +97,6 @@ function build_dist_min(){
   .pipe(gulp.dest('dist/'));
 }
 
-// this is used to manually build jsrsasign with the fewest modules to reduce its size
 var files = [
      'jsrsasign/header.js'
 
@@ -113,8 +112,8 @@ var files = [
 //    ,'jsrsasign/ext/cj/sha1_min.js'
     ,'jsrsasign/ext/cj/sha256_min.js'
 //    ,'jsrsasign/ext/cj/sha224_min.js'
-//    ,'jsrsasign/ext/cj/sha512_min.js'
-//    ,'jsrsasign/ext/cj/sha384_min.js'
+    ,'jsrsasign/ext/cj/sha512_min.js'
+    ,'jsrsasign/ext/cj/sha384_min.js'
 //    ,'jsrsasign/ext/cj/ripemd160_min.js'
 //    ,'jsrsasign/ext/cj/hmac_min.js'
 //    ,'jsrsasign/ext/cj/pbkdf2_min.js'
@@ -130,8 +129,8 @@ var files = [
     ,'jsrsasign/ext/ec-patch-min.js'
     ,'jsrsasign/ext/json-sans-eval-min.js'
 
-//	  ,'jsrsasign/min/asn1-1.0.min.js'
-//  	,'jsrsasign/min/asn1hex-1.1.min.js'
+	  ,'jsrsasign/min/asn1-1.0.min.js'
+  	,'jsrsasign/min/asn1hex-1.1.min.js'
 //  	,'jsrsasign/min/asn1x509-1.0.min.js'
 //  	,'jsrsasign/min/asn1cms-1.0.min.js'
 //  	,'jsrsasign/min/asn1tsp-1.0.min.js'
@@ -152,6 +151,7 @@ var files = [
 
     ,'jsrsasign/footer.js'
 ];
+
 
 function build_jsrsasign(){
     return gulp.src(files)
@@ -199,9 +199,10 @@ function build_slim_rsa() {
 
     // This plugin should always be first in the chain
     conf.plugins.unshift(
-        new webpack.NormalModuleReplacementPlugin(/(.*)JoseUtil(\.js)?$/, (resource) => {
-            resource.request = resource.request.replace(/JoseUtil/, 'JoseUtilRsa');
-        })
+		new webpack.NormalModuleReplacementPlugin(/(.*)crypto-jsrsasign(\.*)/, (resource) => {
+			resource.request = resource.request.replace(/crypto-jsrsasign/, `crypto-rsa`);
+			})
+
     );
 
     return gulp.src('index.js')
